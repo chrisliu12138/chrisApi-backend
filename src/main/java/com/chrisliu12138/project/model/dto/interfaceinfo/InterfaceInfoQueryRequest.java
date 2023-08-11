@@ -70,12 +70,6 @@ public class InterfaceInfoQueryRequest extends PageRequest implements Serializab
     private Long userId;
 
 
-    /**
-     * 是否删除(0-未删, 1-已删)
-     */
-    @TableLogic
-    private Integer isDelete;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+//    @TableField(exist = false)
+//    private static final long serialVersionUID = 1L;
 }

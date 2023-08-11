@@ -26,10 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 帖子接口
- *
  * @author chrisliu12138
  */
+
 @RestController
 @RequestMapping("/InterfaceInfo")
 @Slf4j

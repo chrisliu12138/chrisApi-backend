@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 用户服务实现类
  *
- * @author bobochang
+ * @author chrisliu12138
  */
 @Service
 @Slf4j
@@ -33,7 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     /**
      * 盐值，混淆密码
      */
-    private static final String SALT = "bobochang";
+    private static final String SALT = "chrisliu12138";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
