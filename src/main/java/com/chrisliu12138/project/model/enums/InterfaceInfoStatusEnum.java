@@ -5,20 +5,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 帖子性别枚举
+ * 接口信息状态枚举
  *
  * @author chrisliu12138
  */
-public enum PostGenderEnum {
+public enum InterfaceInfoStatusEnum {
 
-    MALE("男", 0),
-    FEMALE("女", 1);
+    OFFLINE("关闭", 0),
+    ONLINE("上线", 1);
 
     private final String text;
 
     private final int value;
 
-    PostGenderEnum(String text, int value) {
+    InterfaceInfoStatusEnum(String text, int value) {
         this.text = text;
         this.value = value;
     }

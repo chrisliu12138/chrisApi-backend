@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @TableName product
  */
 @Data
-public class InterfaceInfoUpdateRequest implements Serializable {
+public class IdRequest implements Serializable {
 
     /**
      * 主键

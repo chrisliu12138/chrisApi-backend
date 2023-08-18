@@ -168,7 +168,7 @@ public class UserController {
     }
 
     /**
-     * 根据 id 获取用户
+     * 根据 id 获取用户(仅管理员)
      *
      * @param id
      * @param request
@@ -236,6 +236,37 @@ public class UserController {
         userVOPage.setRecords(userVOList);
         return ResultUtils.success(userVOPage);
     }
-
-    // endregion
+//
+//    /**
+//     * 更新个人信息
+//     *
+//     * @param userUpdateMyRequest
+//     * @param request
+//     * @return
+//     */
+//    @PostMapping("/update/my")
+//    public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
+//                                              HttpServletRequest request) {
+//        if (userUpdateMyRequest == null) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//        User loginUser = userService.getLoginUser(request);
+//        User user = new User();
+//        BeanUtils.copyProperties(userUpdateMyRequest, user);
+//        user.setId(loginUser.getId());
+//        boolean result = userService.updateUserInfo(user);
+//        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+//        return ResultUtils.success(true);
+//    }
+//
+//    /**
+//     * 重新生成ak、sk
+//     * @param request
+//     * @return
+//     */
+//    @GetMapping("/reload")
+//    public BaseResponse<Boolean> reloadKey(HttpServletRequest request) {
+//        User loginUser = userService.getLoginUser(request);
+//        return ResultUtils.success(userService.reloadKey(loginUser));
+//    }
 }
