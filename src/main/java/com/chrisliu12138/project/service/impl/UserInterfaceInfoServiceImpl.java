@@ -26,11 +26,11 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         // 创建时，所有参数必须非空
         if (add) {
             if (userInterfaceInfo.getInterfaceInfoId() <= 0 || userInterfaceInfo.getUserId() <= 0) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "接口或用户不存在");
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "Interface or user does not exist");
             }
         }
         if (userInterfaceInfo.getLeftNum() < 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "剩余次数不能小于 0");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Remaining count cannot be less than 0");
         }
     }
 

@@ -10,6 +10,7 @@ import com.chrisliu12138.project.common.ErrorCode;
 import com.chrisliu12138.project.common.ResultUtils;
 import com.chrisliu12138.project.constant.CommonConstant;
 import com.chrisliu12138.project.exception.BusinessException;
+import com.chrisliu12138.project.exception.ThrowUtils;
 import com.chrisliu12138.project.model.dto.interfaceinfo.InterfaceInfoAddRequest;
 import com.chrisliu12138.project.model.dto.interfaceinfo.InterfaceInfoInvokeRequest;
 import com.chrisliu12138.project.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
@@ -19,7 +20,9 @@ import com.chrisliu12138.project.model.entity.User;
 import com.chrisliu12138.project.model.enums.InterfaceInfoStatusEnum;
 import com.chrisliu12138.project.service.InterfaceInfoService;
 import com.chrisliu12138.project.service.UserService;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -209,29 +212,40 @@ public class InterfaceInfoController {
      */
     @PostMapping("/online")
     @AuthCheck(mustRole = "admin")
+//    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
+//                                                     HttpServletRequest request) {
+//        long id = idRequest.getId();
+//        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+//
+//        if (idRequest == null || idRequest.getId() <= 0) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//
+//        // 判断id是否存在
+//        if (oldInterfaceInfo == null) {
+//            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+//        }
+//        // 判断该接口是否可以调用
+//        com.chrisliu12138.chrisapiclientsdk.model.User user = new com.chrisliu12138.chrisapiclientsdk.model.User();
+//        user.setUsername("chris");
+//        String username = chrisApiClient.getUsernameByPost(user);
+//        if(StringUtils.isBlank(username)) {
+//            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"接口验证失败");
+//        }
+//        // 仅本人或管理员可修改
+//        InterfaceInfo interfaceInfo = new InterfaceInfo();
+//        interfaceInfo.setId(id);
+//        interfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
+//        boolean result = interfaceInfoService.updateById(interfaceInfo);
+//        return ResultUtils.success(result);
+//    }
     public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
                                                      HttpServletRequest request) {
-        long id = idRequest.getId();
-        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
-
-        if (idRequest == null || idRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-
-        // 判断id是否存在
-        if (oldInterfaceInfo == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
-        }
-        // 判断该接口是否可以调用
-        com.chrisliu12138.chrisapiclientsdk.model.User user = new com.chrisliu12138.chrisapiclientsdk.model.User();
-        user.setUsername("chris");
-        String username = chrisApiClient.getUsernameByPost(user);
-        if(StringUtils.isBlank(username)) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"接口验证失败");
-        }
-        // 仅本人或管理员可修改
+        ThrowUtils.throwIf(ObjectUtils.isEmpty(idRequest.getId()), ErrorCode.PARAMS_ERROR);
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(idRequest.getId());
+        ThrowUtils.throwIf(ObjectUtils.isEmpty(oldInterfaceInfo), ErrorCode.NOT_FOUND_ERROR);
         InterfaceInfo interfaceInfo = new InterfaceInfo();
-        interfaceInfo.setId(id);
+        interfaceInfo.setId(idRequest.getId());
         interfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
@@ -273,7 +287,27 @@ public class InterfaceInfoController {
     public BaseResponse<Object> invokeInterface(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
                                                 HttpServletRequest request) {
 
-        return ResultUtils.success(interfaceInfoService.invokeInterfaceInfo(interfaceInfoInvokeRequest,request));
+        if(interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long id = interfaceInfoInvokeRequest.getId();
+        String userRequestParams = interfaceInfoInvokeRequest.getUserRequestParams();
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if(oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if(oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Interface closed");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        ChrisApiClient tempClient = new ChrisApiClient(accessKey, secretKey);
+        Gson gson = new Gson();
+        com.chrisliu12138.chrisapiclientsdk.model.User user = gson.fromJson(userRequestParams, com.chrisliu12138.chrisapiclientsdk.model.User.class);
+        String usernameByPost = tempClient.getUsernameByPost(user);
+//        return ResultUtils.success(interfaceInfoService.invokeInterfaceInfo(interfaceInfoInvokeRequest,request));
+        return ResultUtils.success(usernameByPost);
     }
     //endregion
 }

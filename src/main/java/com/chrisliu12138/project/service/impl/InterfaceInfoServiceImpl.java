@@ -60,7 +60,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         // 判断传参是否规范
         ThrowUtils.throwIf(ObjectUtils.isEmpty(interfaceInfoInvokeRequest) || interfaceInfoInvokeRequest.getId() < 1, ErrorCode.PARAMS_ERROR);
         Long id = interfaceInfoInvokeRequest.getId();
-        String params = interfaceInfoInvokeRequest.getRequestParams();
+        String params = interfaceInfoInvokeRequest.getUserRequestParams();
         // 判断接口是否存在
         InterfaceInfo oldInterfaceInfo = getById(id);
         ThrowUtils.throwIf(ObjectUtils.isEmpty(oldInterfaceInfo), ErrorCode.NOT_FOUND_ERROR);
@@ -72,10 +72,11 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
         ChrisApiClient tempClient = new ChrisApiClient(accessKey, secretKey);
-        //调用冷笑话 以后记得取消注释
+        // todo 取消注释 随机笑话
 //        if (oldInterfaceInfo.getUrl().contains("randomMessage")) {
 //            res = tempClient.randomMessage(interfaceInfoInvokeRequest.getRequestParams());
 //        }
+
         if (oldInterfaceInfo.getUrl().contains("name")) {
             Gson gson = new Gson();
             User user = gson.fromJson(params, User.class);
